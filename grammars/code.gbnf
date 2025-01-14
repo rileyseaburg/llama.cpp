@@ -1,0 +1,47 @@
+# Repository-level code completion grammar
+root ::= repo_content code_completion
+
+# Repository structure
+repo_content ::= repo_name file_sections
+repo_name ::= "<|repo_name|>" [a-zA-Z0-9_-]+ "\n"
+file_sections ::= file_section+
+file_section ::= "<|file_sep|>" file_path "\n" file_content
+file_path ::= [a-zA-Z0-9_/.-]+
+file_content ::= (code_line | empty_line)*
+
+# Code elements
+code_completion ::= (code_line | empty_line)*
+code_line ::= whitespace? (statement | declaration | expression | comment) "\n"
+empty_line ::= whitespace? "\n"
+whitespace ::= [ \t]+
+
+# Basic code constructs
+statement ::= (import_stmt | if_stmt | for_stmt | while_stmt | return_stmt | assignment | function_call | class_def | function_def)
+declaration ::= (var_decl | const_decl | type_decl)
+expression ::= (literal | identifier | operator_expr | parenthesized_expr)
+
+# Common programming elements
+import_stmt ::= "import" [^\n]* | "from" [^\n]*
+if_stmt ::= "if" [^\n]* | "elif" [^\n]* | "else" [^\n]*
+for_stmt ::= "for" [^\n]*
+while_stmt ::= "while" [^\n]*
+return_stmt ::= "return" [^\n]*
+assignment ::= identifier whitespace? "=" [^\n]*
+function_call ::= identifier "(" [^)]* ")"
+class_def ::= "class" [^\n]*
+function_def ::= ("def" | "function" | "fn") [^\n]*
+
+# Basic elements
+identifier ::= [a-zA-Z_][a-zA-Z0-9_]*
+literal ::= (string_literal | number_literal | boolean_literal)
+string_literal ::= "\"" [^"]* "\"" | "'" [^']* "'"
+number_literal ::= [0-9]+ ("." [0-9]+)?
+boolean_literal ::= "true" | "false"
+operator_expr ::= [^\n]+
+parenthesized_expr ::= "(" [^)]* ")"
+comment ::= ("#" | "//") [^\n]*
+
+# Variable declarations
+var_decl ::= ("var" | "let" | "const") [^\n]*
+const_decl ::= "const" [^\n]*
+type_decl ::= "type" [^\n]*

@@ -84,11 +84,33 @@ ENTRYPOINT [ "/app/llama-cli" ]
 FROM base AS server
 
 ENV LLAMA_ARG_HOST=0.0.0.0
+# Configure model settings for QVQ-72B with extended context and special tokens
+ENV LLAMACPP_ARGS="\
+    --n-gpu-layers 40 \
+    --ctx-size 131072 \
+    --threads 16 \
+    --chat-template chatml \
+    --rope-scaling-type yarn \
+    --rope-freq-scale 4.0 \
+    --rope-freq-base 32768 \
+    --grammar-file /app/grammars/code.gbnf \
+    --prompt-cache-all \
+    --prompt-cache-ro \
+    --mlock \
+    --numa \
+    --tensor-split 18:18:26:38 \
+    --custom-token '<|repo_name|>' \
+    --custom-token '<|file_sep|>' \
+    --in-prefix '<|im_start|>user\n' \
+    --in-suffix '</s>' \
+    --reverse-prompt '<|im_start|>user'"
 
 COPY --from=build /app/full/llama-server /app
+COPY --from=build /app/grammars/code.gbnf /app/grammars/
 
 WORKDIR /app
 
 HEALTHCHECK CMD [ "curl", "-f", "http://localhost:8080/health" ]
 
-ENTRYPOINT [ "/app/llama-server" ]
+# Use environment variables in server startup
+ENTRYPOINT [ "sh", "-c", "/app/llama-server $LLAMACPP_ARGS" ]
