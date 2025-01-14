@@ -8,7 +8,9 @@
 - Set up tensor splitting for optimal GPU memory usage
 
 ## Current Task
-- Added Docker build and push workflow for CUDA container
+- Fixed invalid rope-scaling-type argument in cuda.Dockerfile by changing from "yarn" to "linear"
+- Triggered Docker build and push workflow for CUDA container
+- Monitoring build progress
 
 ## Next Issues to Fix
 1. Monitor Docker build workflow execution
