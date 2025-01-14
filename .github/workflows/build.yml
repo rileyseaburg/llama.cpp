@@ -37,6 +37,18 @@ jobs:
           cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DGGML_NATIVE=OFF -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=89-real -DCMAKE_EXE_LINKER_FLAGS=-Wl,--allow-shlib-undefined -DLLAMA_FATAL_WARNINGS=ON
           cmake --build build
 
+      - name: Package binaries
+        run: |
+          mkdir -p dist
+          cp build/bin/* dist/
+          zip -r llama-cuda-binaries.zip dist/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: llama-cuda-binaries
+          path: llama-cuda-binaries.zip
+
   docker-build-and-push:
     name: Build and Push Docker Images
     runs-on: ubuntu-latest
