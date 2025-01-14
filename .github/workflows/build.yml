@@ -1196,11 +1196,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ubuntu-latest-cmake-cuda]  # Ensure CUDA build succeeds first
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-    
+
     permissions:
       packages: write
       contents: read
-    
+
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
