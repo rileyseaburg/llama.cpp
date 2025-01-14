@@ -36,7 +36,7 @@ jobs:
         config:
           # Multi-stage build
           - { tag: "cpu", dockerfile: ".devops/cpu.Dockerfile", platforms: "linux/amd64,linux/arm64", full: true, light: true, server: true, freediskspace: false}
-          - { tag: "cuda", dockerfile: ".devops/cuda.Dockerfile", platforms: "linux/amd64", full: true, light: true, server: true, freediskspace: false}
+          - { tag: "cuda", dockerfile: ".devops/cuda.Dockerfile", platforms: "linux/amd64", full: true, light: true, server: true, freediskspace: false, cuda_version: "12.6.0"}
           - { tag: "musa", dockerfile: ".devops/musa.Dockerfile", platforms: "linux/amd64", full: true, light: true, server: true, freediskspace: false}
           - { tag: "intel", dockerfile: ".devops/intel.Dockerfile", platforms: "linux/amd64", full: true, light: true, server: true, freediskspace: false}
           - { tag: "vulkan", dockerfile: ".devops/vulkan.Dockerfile", platforms: "linux/amd64", full: true, light: true, server: true, freediskspace: false}
@@ -155,6 +155,8 @@ jobs:
       - name: Build and push Server Docker image (tagged + versioned)
         if: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && matrix.config.server == true }}
         uses: docker/build-push-action@v6
+        env:
+          CUDA_VERSION: ${{ matrix.config.cuda_version }}
         with:
           context: .
           push: true
@@ -164,6 +166,8 @@ jobs:
           file: ${{ matrix.config.dockerfile }}
           target: server
           provenance: false
+          build-args: |
+            CUDA_VERSION=${{ matrix.config.cuda_version }}
           # using github experimental cache
           cache-from: type=gha
           cache-to: type=gha,mode=max
