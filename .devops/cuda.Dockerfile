@@ -93,7 +93,7 @@ ENV LLAMACPP_ARGS="\
     --rope-freq-base 32768 \
     --rope-scale 4.0 \
     --grammar-file /app/grammars/code.gbnf \
-    --prompt-cache-all \
+    --prompt-cache /app/cache/prompt.cache \
     --prompt-cache-ro \
     --mlock \
     --numa \
