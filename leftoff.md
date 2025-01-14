@@ -8,8 +8,8 @@
 - Set up tensor splitting for optimal GPU memory usage
 
 ## Current Task
-- Fixed invalid rope-scaling-type argument in cuda.Dockerfile by changing from "yarn" to "linear"
-- Triggered Docker build and push workflow for CUDA container
+- Fixed invalid rope-scaling-type argument in cuda.Dockerfile by changing to correct rope scaling parameters
+- Updated rope scaling configuration to use --rope-freq-base and --rope-scale
 - Monitoring build progress
 
 ## Next Issues to Fix

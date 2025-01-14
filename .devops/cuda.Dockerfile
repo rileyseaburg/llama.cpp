@@ -90,9 +90,8 @@ ENV LLAMACPP_ARGS="\
     --ctx-size 131072 \
     --threads 16 \
     --chat-template chatml \
-    --rope-scaling-type linear \
-    --rope-freq-scale 4.0 \
     --rope-freq-base 32768 \
+    --rope-scale 4.0 \
     --grammar-file /app/grammars/code.gbnf \
     --prompt-cache-all \
     --prompt-cache-ro \
