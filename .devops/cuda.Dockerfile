@@ -100,10 +100,7 @@ ENV LLAMACPP_ARGS="\
     --numa \
     --tensor-split 18:18:26:38 \
     --custom-token '<|repo_name|>' \
-    --custom-token '<|file_sep|>' \
-    --in-prefix '<|im_start|>user\n' \
-    --in-suffix '</s>' \
-    --reverse-prompt '<|im_start|>user'"
+    --custom-token '<|file_sep|>'"
 
 COPY --from=build /app/full/llama-server /app
 COPY --from=build /app/grammars/code.gbnf /app/grammars/
