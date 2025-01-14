@@ -8,17 +8,20 @@
 - Set up tensor splitting for optimal GPU memory usage
 
 ## Current Task
-- Implemented container support for Qwen2-72B-Instruct with repository-level code completion capabilities
+- Added Docker build and push workflow for CUDA container
 
 ## Next Issues to Fix
-1. Test repository-level code completion with example codebase
-2. Verify memory usage and GPU layer distribution
-3. Validate special token handling with the model
-4. Test extended context window performance
-5. Monitor and optimize prompt caching behavior
+1. Monitor Docker build workflow execution
+2. Test repository-level code completion with example codebase
+3. Verify memory usage and GPU layer distribution
+4. Validate special token handling with the model
+5. Test extended context window performance
+6. Monitor and optimize prompt caching behavior
 
 ## Notes
+- Docker container will be built and pushed to ghcr.io/{owner}/llama-cuda:latest and ghcr.io/{owner}/llama-cuda:{commit-sha}
+- Container includes QVQ-72B model support with repository-level code completion
+- Using CUDA 12.6.0 with optimized tensor splitting (18:18:26:38)
 - Using QVQ-72B model from huggingface.co/bartowski/QVQ-72B-Preview-GGUF
 - Configured for ChatML format with custom tokens
 - Set up with YARN rope scaling (factor: 4.0, base: 32768)
-- Using tensor split configuration: 18:18:26:38
