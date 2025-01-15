@@ -14,9 +14,9 @@ ARG CUDA_DOCKER_ARCH=default
 RUN apt-get update && \
     apt-get install -y build-essential cmake python3 python3-pip git libcurl4-openssl-dev libgomp1
 
-WORKDIR /app
+WORKDIR /app/llama.cpp
 
-COPY . .
+COPY ../ . .
 
 RUN if [ "${CUDA_DOCKER_ARCH}" != "default" ]; then \
     export CMAKE_ARGS="-DCMAKE_CUDA_ARCHITECTURES=${CUDA_DOCKER_ARCH}"; \
@@ -24,19 +24,21 @@ RUN if [ "${CUDA_DOCKER_ARCH}" != "default" ]; then \
     cmake -B build -DGGML_NATIVE=OFF -DGGML_CUDA=ON -DLLAMA_CURL=ON ${CMAKE_ARGS} -DCMAKE_EXE_LINKER_FLAGS=-Wl,--allow-shlib-undefined . && \
     cmake --build build --config Release -j$(nproc)
 
-RUN mkdir -p /app/lib && \
-    find build -name "*.so" -exec cp {} /app/lib \;
+RUN mkdir -p /app/llama.cpp/lib && \
+    find build -name "*.so" -exec cp {} /app/llama.cpp/lib \;
 
-RUN mkdir -p /app/full \
-    && cp build/bin/* /app/full \
-    && cp *.py /app/full \
-    && cp -r gguf-py /app/full \
-    && cp -r requirements /app/full \
-    && cp requirements.txt /app/full \
-    && cp .devops/tools.sh /app/full/tools.sh
+RUN mkdir -p /app/llama.cpp/full \
+    && cp build/bin/* /app/llama.cpp/full \
+    && cp *.py /app/llama.cpp/full \
+    && cp -r gguf-py /app/llama.cpp/full \
+    && cp -r requirements /app/llama.cpp/full \
+    && cp requirements.txt /app/llama.cpp/full \
+    && cp .devops/tools.sh /app/llama.cpp/full/tools.sh
 
 ## Base image
 FROM ${BASE_CUDA_RUN_CONTAINER} AS base
+
+ENV LD_LIBRARY_PATH=/app/llama.cpp/lib:${LD_LIBRARY_PATH}
 
 RUN apt-get update \
     && apt-get install -y libgomp1 curl\
@@ -46,14 +48,14 @@ RUN apt-get update \
     && find /var/cache/apt/archives /var/lib/apt/lists -not -name lock -type f -delete \
     && find /var/cache -type f -delete
 
-COPY --from=build /app/lib/ /app
+COPY --from=build /app/llama.cpp/lib/ /app/llama.cpp/lib/
 
 ### Full
 FROM base AS full
 
-COPY --from=build /app/full /app
+COPY --from=build /app/llama.cpp/full /app/llama.cpp/
 
-WORKDIR /app
+WORKDIR /app/llama.cpp
 
 RUN apt-get update \
     && apt-get install -y \
@@ -68,47 +70,55 @@ RUN apt-get update \
     && find /var/cache/apt/archives /var/lib/apt/lists -not -name lock -type f -delete \
     && find /var/cache -type f -delete
 
-
-ENTRYPOINT ["/app/tools.sh"]
+ENTRYPOINT ["/app/llama.cpp/tools.sh"]
 
 ### Light, CLI only
 FROM base AS light
 
-COPY --from=build /app/full/llama-cli /app
+COPY --from=build /app/llama.cpp/full/llama-cli /app/llama.cpp/
 
-WORKDIR /app
+WORKDIR /app/llama.cpp
 
-ENTRYPOINT [ "/app/llama-cli" ]
+ENTRYPOINT [ "/app/llama.cpp/llama-cli" ]
 
 ### Server, Server only
 FROM base AS server
 
-ENV LLAMA_ARG_HOST=0.0.0.0
-# Configure model settings for QVQ-72B with extended context and special tokens
-ENV LLAMACPP_ARGS="\
-    --n-gpu-layers 40 \
-    --ctx-size 131072 \
-    --threads 16 \
-    --chat-template chatml \
-    --rope-freq-base 32768 \
-    --rope-scale 4.0 \
-    --grammar-file /app/grammars/code.gbnf \
-    --prompt-cache=/app/cache/prompt.bin --prompt-cache-ro \
-    --mlock \
-    --numa \
-    --tensor-split 18:18:26:38 \
-    --custom-token '<|repo_name|>' \
-    --custom-token '<|file_sep|>'"
+ENV LLAMA_N_GPU_LAYERS=40
+ENV LLAMA_CTX_SIZE=131072
+ENV LLAMA_THREADS=16
+ENV LLAMA_ROPE_FREQ_BASE=32768
+ENV LLAMA_ROPE_SCALE=4.0
+ENV LLAMA_PROMPT_CACHE=/app/llama.cpp/cache
+ENV LLAMA_CHAT_TEMPLATE=chatml
+ENV LLAMA_GRAMMAR_FILE=/app/llama.cpp/grammars/code.gbnf
+ENV LLAMA_MLOCK=1
+ENV LLAMA_NUMA=1
+ENV LLAMA_TENSOR_SPLIT=18:18:26:38
+ENV LLAMA_CUSTOM_TOKEN="<|repo_name|><|file_sep|>"
+ENV LLAMA_MODEL=/app/llama.cpp/models/model.gguf
 
-COPY --from=build /app/full/llama-server /app
-COPY --from=build /app/grammars/code.gbnf /app/grammars/
+COPY --from=build /app/llama.cpp/full/llama-server /app/llama.cpp/
+COPY --from=build /app/llama.cpp/grammars/code.gbnf /app/llama.cpp/grammars/
 
-WORKDIR /app
+WORKDIR /app/llama.cpp
 
-# Create prompt cache directory with appropriate permissions
-RUN mkdir -p /app/cache && chmod 777 /app/cache
+# Create required directories with appropriate permissions
+RUN mkdir -p /app/llama.cpp/cache /app/llama.cpp/models && chmod 777 /app/llama.cpp/cache /app/llama.cpp/models
 
 HEALTHCHECK CMD [ "curl", "-f", "http://localhost:8080/health" ]
 
-# Use environment variables in server startup
-ENTRYPOINT [ "sh", "-c", "/app/llama-server $LLAMACPP_ARGS" ]
+ENTRYPOINT [ "sh", "-c", "echo 'Debug: Library paths and files:' && \
+echo 'LD_LIBRARY_PATH=' $LD_LIBRARY_PATH && \
+echo 'Contents of /app/llama.cpp/lib:' && \
+ls -la /app/llama.cpp/lib && \
+echo 'Contents of /app/llama.cpp/build:' && \
+ls -la /app/llama.cpp/build && \
+echo 'Running ldd on server binary:' && \
+ldd /app/llama.cpp/llama-server && \
+echo 'Starting server with command:' && \
+echo /app/llama.cpp/llama-server -m $LLAMA_MODEL --n-gpu-layers $LLAMA_N_GPU_LAYERS --ctx-size $LLAMA_CTX_SIZE --threads $LLAMA_THREADS --rope-freq-base $LLAMA_ROPE_FREQ_BASE --rope-scale $LLAMA_ROPE_SCALE --grammar-file $LLAMA_GRAMMAR_FILE --prompt-cache $LLAMA_PROMPT_CACHE --mlock --numa --tensor-split $LLAMA_TENSOR_SPLIT --custom-token $LLAMA_CUSTOM_TOKEN && \
+/app/llama.cpp/llama-server -m $LLAMA_MODEL --n-gpu-layers $LLAMA_N_GPU_LAYERS --ctx-size $LLAMA_CTX_SIZE --threads $LLAMA_THREADS --rope-freq-base $LLAMA_ROPE_FREQ_BASE --rope-scale $LLAMA_ROPE_SCALE --grammar-file $LLAMA_GRAMMAR_FILE --prompt-cache $LLAMA_PROMPT_CACHE --mlock --numa --tensor-split $LLAMA_TENSOR_SPLIT --custom-token $LLAMA_CUSTOM_TOKEN" ]
+
+# Usage: Mount your GGUF model file when running the container:
+# docker run -v /path/to/your/model.gguf:/app/llama.cpp/models/model.gguf llama-cuda:debug
