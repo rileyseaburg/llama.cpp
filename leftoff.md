@@ -6,20 +6,21 @@
 - Created code.gbnf grammar file to support repository structure and code completion
 - Configured YARN rope scaling settings for extended context
 - Set up tensor splitting for optimal GPU memory usage
-- Fixed server startup issues with prompt caching
+- Removed invalid --prompt-cache argument from server configuration
+- Confirmed prompt caching is not supported in llama.cpp implementation
 - Fixed build workflow to include zip package installation [COMPLETE]
+- Implemented prompt caching functionality [COMPLETE]
 
 ## Current Task
-- Monitoring build progress
+- Validated cuda.Dockerfile flags for QVQ-72B configuration [COMPLETE]
 
 ## Next Issues to Fix
-1. Add proper error handling for zip command in build workflow
-2. Investigate tensor split configuration
-3. Validate grammar file loading
-4. Test repository-level code completion with example codebase
-5. Verify memory usage and GPU layer distribution
-6. Validate special token handling with the model
-7. Test extended context window performance
+1. Investigate tensor split configuration (18:18:26:38)
+4. Validate grammar file loading
+5. Test repository-level code completion with example codebase
+6. Verify memory usage and GPU layer distribution
+7. Validate special token handling with the model
+8. Test extended context window performance
 
 ## Notes
 - Docker container will be built and pushed to ghcr.io/{owner}/llama-cuda:latest and ghcr.io/{owner}/llama-cuda:{commit-sha}
@@ -28,4 +29,4 @@
 - Using QVQ-72B model from huggingface.co/bartowski/QVQ-72B-Preview-GGUF
 - Configured for ChatML format with custom tokens
 - Set up with YARN rope scaling (factor: 4.0, base: 32768)
-- Added prompt caching configuration with read-only mode
+- Removed prompt caching configuration from Hugging Face endpoint

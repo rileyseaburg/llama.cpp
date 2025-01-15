@@ -106,6 +106,9 @@ COPY --from=build /app/grammars/code.gbnf /app/grammars/
 
 WORKDIR /app
 
+# Create prompt cache directory with appropriate permissions
+RUN mkdir -p /app/cache && chmod 777 /app/cache
+
 HEALTHCHECK CMD [ "curl", "-f", "http://localhost:8080/health" ]
 
 # Use environment variables in server startup
