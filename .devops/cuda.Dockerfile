@@ -16,7 +16,7 @@ RUN apt-get update && \
 
 WORKDIR /app/llama.cpp
 
-COPY ../ . .
+COPY ../ . 
 
 RUN if [ "${CUDA_DOCKER_ARCH}" != "default" ]; then \
     export CMAKE_ARGS="-DCMAKE_CUDA_ARCHITECTURES=${CUDA_DOCKER_ARCH}"; \
@@ -89,7 +89,6 @@ ENV LLAMA_CTX_SIZE=131072
 ENV LLAMA_THREADS=16
 ENV LLAMA_ROPE_FREQ_BASE=32768
 ENV LLAMA_ROPE_SCALE=4.0
-ENV LLAMA_PROMPT_CACHE=/app/llama.cpp/cache
 ENV LLAMA_CHAT_TEMPLATE=chatml
 ENV LLAMA_GRAMMAR_FILE=/app/llama.cpp/grammars/code.gbnf
 ENV LLAMA_MLOCK=1
@@ -115,8 +114,8 @@ ls -la /app/llama.cpp/lib && \
 echo 'Running ldd on server binary:' && \
 ldd /app/llama.cpp/llama-server && \
 echo 'Starting server with command:' && \
-echo /app/llama.cpp/llama-server -m $LLAMA_MODEL --n-gpu-layers $LLAMA_N_GPU_LAYERS --ctx-size $LLAMA_CTX_SIZE --threads $LLAMA_THREADS --rope-freq-base $LLAMA_ROPE_FREQ_BASE --rope-scale $LLAMA_ROPE_SCALE --grammar-file $LLAMA_GRAMMAR_FILE --prompt-cache $LLAMA_PROMPT_CACHE --mlock --numa --tensor-split $LLAMA_TENSOR_SPLIT --custom-token $LLAMA_CUSTOM_TOKEN && \
-/app/llama.cpp/llama-server -m $LLAMA_MODEL --n-gpu-layers $LLAMA_N_GPU_LAYERS --ctx-size $LLAMA_CTX_SIZE --threads $LLAMA_THREADS --rope-freq-base $LLAMA_ROPE_FREQ_BASE --rope-scale $LLAMA_ROPE_SCALE --grammar-file $LLAMA_GRAMMAR_FILE --prompt-cache $LLAMA_PROMPT_CACHE --mlock --numa --tensor-split $LLAMA_TENSOR_SPLIT --custom-token $LLAMA_CUSTOM_TOKEN" ]
+echo /app/llama.cpp/llama-server -m $LLAMA_MODEL --n-gpu-layers $LLAMA_N_GPU_LAYERS --ctx-size $LLAMA_CTX_SIZE --threads $LLAMA_THREADS --rope-freq-base $LLAMA_ROPE_FREQ_BASE --rope-scale $LLAMA_ROPE_SCALE --grammar-file $LLAMA_GRAMMAR_FILE --mlock --numa --tensor-split $LLAMA_TENSOR_SPLIT --custom-token $LLAMA_CUSTOM_TOKEN && \
+/app/llama.cpp/llama-server -m $LLAMA_MODEL --n-gpu-layers $LLAMA_N_GPU_LAYERS --ctx-size $LLAMA_CTX_SIZE --threads $LLAMA_THREADS --rope-freq-base $LLAMA_ROPE_FREQ_BASE --rope-scale $LLAMA_ROPE_SCALE --grammar-file $LLAMA_GRAMMAR_FILE --mlock --numa --tensor-split $LLAMA_TENSOR_SPLIT --custom-token $LLAMA_CUSTOM_TOKEN" ]
 
 # Usage: Mount your GGUF model file when running the container:
 # docker run -v /path/to/your/model.gguf:/app/llama.cpp/models/model.gguf llama-cuda:debug
