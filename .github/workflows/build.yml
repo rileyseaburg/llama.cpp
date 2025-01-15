@@ -30,7 +30,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           apt update
-          apt install -y cmake build-essential ninja-build libgomp1 git
+          apt install -y cmake build-essential ninja-build libgomp1 git zip
 
       - name: Build with CMake
         run: |
