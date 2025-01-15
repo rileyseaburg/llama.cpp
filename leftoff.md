@@ -9,13 +9,14 @@
 - Removed invalid --prompt-cache argument from server configuration
 - Confirmed prompt caching is not supported in llama.cpp implementation
 - Fixed build workflow to include zip package installation [COMPLETE]
-- Implemented prompt caching functionality [COMPLETE]
+- Updated Dockerfile with correct prompt cache flags (--prompt-cache-all and --prompt-cache-ro) [COMPLETE]
+- Removed invalid --prompt-cache argument
 
 ## Current Task
-- Validated cuda.Dockerfile flags for QVQ-72B configuration [COMPLETE]
+- Investigate tensor split configuration
 
 ## Next Issues to Fix
-1. Investigate tensor split configuration (18:18:26:38)
+1. Validate grammar file loading
 4. Validate grammar file loading
 5. Test repository-level code completion with example codebase
 6. Verify memory usage and GPU layer distribution
