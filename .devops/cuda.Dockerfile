@@ -112,8 +112,6 @@ ENTRYPOINT [ "sh", "-c", "echo 'Debug: Library paths and files:' && \
 echo 'LD_LIBRARY_PATH=' $LD_LIBRARY_PATH && \
 echo 'Contents of /app/llama.cpp/lib:' && \
 ls -la /app/llama.cpp/lib && \
-echo 'Contents of /app/llama.cpp/build:' && \
-ls -la /app/llama.cpp/build && \
 echo 'Running ldd on server binary:' && \
 ldd /app/llama.cpp/llama-server && \
 echo 'Starting server with command:' && \
