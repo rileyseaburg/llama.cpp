@@ -16,9 +16,13 @@
     * --prompt-cache-ro: Use prompt cache but don't update it
   - Removed prompt cache from Dockerfile as it's better configured at runtime
   - Note: prompt-cache-all is not compatible with interactive mode
+- Fixed server startup issue by removing prompt cache configuration from Dockerfile
+- Fixed NUMA configuration in Dockerfile:
+  - Changed LLAMA_NUMA=1 to LLAMA_NUMA=distribute
+  - Updated server command to use --numa distribute for proper NUMA strategy
+  - This spreads execution evenly over all nodes for better performance
 
 ## Current Task
-- Fixed server startup issue by removing prompt cache configuration from Dockerfile
 - Next: Download and integrate QVQ-72B model from huggingface.co/lmstudio-community/QVQ-72B-Preview-GGUF
 
 ## Next Issues to Fix
