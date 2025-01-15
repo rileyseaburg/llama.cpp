@@ -8,13 +8,13 @@
 - Set up tensor splitting for optimal GPU memory usage
 - Fixed build workflow to include zip package installation
 - Fixed prompt cache configuration in Dockerfile after code analysis:
-  - Added explicit --prompt-cache path to /app/cache/prompt.bin
+  - Added explicit --prompt-cache=/app/cache/prompt.bin with equals sign syntax
   - Added --prompt-cache-ro flag for read-only operation in server environment
   - Confirmed --prompt-cache-all is not compatible with interactive mode
-  - Verified prompt cache implementation in args.cpp
+  - Fixed argument parsing issue by using equals sign for value assignment
 
 ## Current Task
-- Test server startup with updated prompt cache configuration
+- Test server startup with updated prompt cache configuration and argument syntax
 
 ## Next Issues to Fix
 1. Validate grammar file loading
@@ -30,4 +30,4 @@
 - Using QVQ-72B model from huggingface.co/bartowski/QVQ-72B-Preview-GGUF
 - Configured for ChatML format with custom tokens
 - Set up with YARN rope scaling (factor: 4.0, base: 32768)
-- Prompt cache configured for read-only server operation with explicit cache file path
+- Prompt cache configured for read-only server operation with explicit cache file path using equals sign syntax
