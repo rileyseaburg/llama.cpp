@@ -21,6 +21,10 @@
   - Changed LLAMA_NUMA=1 to LLAMA_NUMA=distribute
   - Updated server command to use --numa distribute for proper NUMA strategy
   - This spreads execution evenly over all nodes for better performance
+- Removed unsupported --custom-token argument:
+  - Removed LLAMA_CUSTOM_TOKEN environment variable
+  - Removed --custom-token flag from server command
+  - Note: Need to investigate alternative way to handle special tokens
 
 ## Current Task
 - Next: Download and integrate QVQ-72B model from huggingface.co/lmstudio-community/QVQ-72B-Preview-GGUF
@@ -30,7 +34,7 @@
 2. Test grammar validation with sample code
 3. Test repository-level code completion with example codebase
 4. Verify memory usage and GPU layer distribution
-5. Validate special token handling with the model
+5. Investigate and implement alternative method for special token handling
 6. Test extended context window performance
 
 ## Required Steps

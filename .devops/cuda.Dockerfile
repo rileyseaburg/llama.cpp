@@ -94,7 +94,6 @@ ENV LLAMA_GRAMMAR_FILE=/app/llama.cpp/grammars/code.gbnf
 ENV LLAMA_MLOCK=1
 ENV LLAMA_NUMA=distribute
 ENV LLAMA_TENSOR_SPLIT=18:18:26:38
-ENV LLAMA_CUSTOM_TOKEN="<|repo_name|><|file_sep|>"
 ENV LLAMA_MODEL=/app/llama.cpp/models/model.gguf
 
 COPY --from=build /app/llama.cpp/full/llama-server /app/llama.cpp/
@@ -114,8 +113,8 @@ ls -la /app/llama.cpp/lib && \
 echo 'Running ldd on server binary:' && \
 ldd /app/llama.cpp/llama-server && \
 echo 'Starting server with command:' && \
-echo /app/llama.cpp/llama-server -m $LLAMA_MODEL --n-gpu-layers $LLAMA_N_GPU_LAYERS --ctx-size $LLAMA_CTX_SIZE --threads $LLAMA_THREADS --rope-freq-base $LLAMA_ROPE_FREQ_BASE --rope-scale $LLAMA_ROPE_SCALE --grammar-file $LLAMA_GRAMMAR_FILE --mlock --numa distribute --tensor-split $LLAMA_TENSOR_SPLIT --custom-token $LLAMA_CUSTOM_TOKEN && \
-/app/llama.cpp/llama-server -m $LLAMA_MODEL --n-gpu-layers $LLAMA_N_GPU_LAYERS --ctx-size $LLAMA_CTX_SIZE --threads $LLAMA_THREADS --rope-freq-base $LLAMA_ROPE_FREQ_BASE --rope-scale $LLAMA_ROPE_SCALE --grammar-file $LLAMA_GRAMMAR_FILE --mlock --numa distribute --tensor-split $LLAMA_TENSOR_SPLIT --custom-token $LLAMA_CUSTOM_TOKEN" ]
+echo /app/llama.cpp/llama-server -m $LLAMA_MODEL --n-gpu-layers $LLAMA_N_GPU_LAYERS --ctx-size $LLAMA_CTX_SIZE --threads $LLAMA_THREADS --rope-freq-base $LLAMA_ROPE_FREQ_BASE --rope-scale $LLAMA_ROPE_SCALE --grammar-file $LLAMA_GRAMMAR_FILE --mlock --numa distribute --tensor-split $LLAMA_TENSOR_SPLIT && \
+/app/llama.cpp/llama-server -m $LLAMA_MODEL --n-gpu-layers $LLAMA_N_GPU_LAYERS --ctx-size $LLAMA_CTX_SIZE --threads $LLAMA_THREADS --rope-freq-base $LLAMA_ROPE_FREQ_BASE --rope-scale $LLAMA_ROPE_SCALE --grammar-file $LLAMA_GRAMMAR_FILE --mlock --numa distribute --tensor-split $LLAMA_TENSOR_SPLIT" ]
 
 # Usage: Mount your GGUF model file when running the container:
 # docker run -v /path/to/your/model.gguf:/app/llama.cpp/models/model.gguf llama-cuda:debug
